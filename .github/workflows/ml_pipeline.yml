@@ -41,6 +41,11 @@ jobs:
             git commit -m "Initialize DVC" || echo "DVC already initialized"
           fi
 
+      - name: Set up DVC remote
+        run: |
+          dvc remote add -d myremote gdrive://1cy4gWVCAgWblPyoAdLSKfZLMsxB9KEhx
+          dvc remote modify myremote gdrive_use_service_account true
+
       - name: Add data to DVC
         run: |
           if git ls-files --error-unmatch data/raw_data.csv; then
@@ -59,6 +64,12 @@ jobs:
           git add dvc.yaml
           git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"
 
+      - name: Add cleaned data to DVC
+        run: |
+          dvc add data/cleaned_data.csv
+          git add data/cleaned_data.csv.dvc
+          git commit -m "Add cleaned data to DVC"
+      
       - name: Pull DVC data from Google Drive
         run: dvc pull
 
