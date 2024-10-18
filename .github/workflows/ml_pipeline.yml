@@ -56,7 +56,7 @@ jobs:
       - name: Create DVC stage
         run: |
           dvc stage add -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python src/clean_data.py
-          git add dvc.yaml dvc.lock
+          git add dvc.yaml
           git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"
 
       - name: Pull DVC data from Google Drive
