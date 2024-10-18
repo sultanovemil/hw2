@@ -62,16 +62,7 @@ jobs:
         run: |
           dvc stage add -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python src/clean_data.py
           git add dvc.yaml
-          git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"
-
-      - name: Add cleaned data to DVC
-        run: |
-          dvc add data/cleaned_data.csv
-          git add data/cleaned_data.csv.dvc
-          git commit -m "Add cleaned data to DVC"
-      
-      - name: Pull DVC data from Google Drive
-        run: dvc pull
+          git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"     
 
       - name: Run DVC pipeline
         run: dvc repro
