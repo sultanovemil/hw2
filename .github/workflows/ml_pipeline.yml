@@ -23,12 +23,32 @@ jobs:
           python -m pip install --upgrade pip
           pip install dvc[gdrive]
 
-      - name: Configure Google Drive credentials
+      - name: Setup Google Drive credentials
         run: |
           echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
           export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"
 
-      - name: Pull DVC data
+      - name: Initialize DVC (if not initialized)
+        run: |
+          if [ ! -d ".dvc" ]; then
+            dvc init
+            git add .dvc .gitignore
+            git commit -m "Initialize DVC" || echo "DVC already initialized"
+          fi
+
+      - name: Add data to DVC
+        run: |
+          dvc add data/raw_data.csv || echo "Data already added to DVC"
+          git add data/raw_data.csv.dvc .gitignore
+          git commit -m "Add raw data to DVC" || echo "Data already tracked"
+
+      - name: Create DVC stage
+        run: |
+          dvc run -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python clean_data.py || echo "DVC stage already exists"
+          git add dvc.yaml dvc.lock
+          git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"
+
+      - name: Pull DVC data from Google Drive
         run: dvc pull
 
       - name: Run DVC pipeline
