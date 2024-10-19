@@ -39,7 +39,7 @@ jobs:
           git config --global user.name "Emil S."
 
       # Инициализация DVC, если он еще не инициализирован
-      - name: Initialize DVC (if not initialized)
+      - name: Initialize DVC
         run: |
           if [ ! -d ".dvc" ]; then
             dvc init
@@ -47,7 +47,7 @@ jobs:
             git commit -m "Initialize DVC" || echo "DVC already initialized"
           fi
 
-      # Ннастройка удаленного хранилища DVC
+      # Настройка удаленного хранилища DVC
       - name: Set up DVC remote
         run: |
           dvc remote add -d myremote gdrive://1cy4gWVCAgWblPyoAdLSKfZLMsxB9KEhx
@@ -74,11 +74,11 @@ jobs:
           git add dvc.yaml
           git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"     
 
-      # Запуска DVC pipeline
+      # Запуск DVC pipeline
       - name: Run DVC pipeline
         run: dvc repro
 
-      # Шаг для отправки очищенного набора данных в удаленное хранилище DVC
+      # Отправка очищенного набора данных в удаленное хранилище DVC
       - name: Push cleaned dataset to DVC remote
         run: dvc push
       
