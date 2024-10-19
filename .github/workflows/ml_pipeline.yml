@@ -68,3 +68,6 @@ jobs:
 
       - name: Run DVC pipeline
         run: dvc repro
+
+      - name: Push cleaned dataset to DVC remote
+        run: dvc push
