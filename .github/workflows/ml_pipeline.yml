@@ -27,14 +27,14 @@ jobs:
 
       - name: Setup Google Drive credentials
         run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
-          export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"
+          echo -e "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
+          export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"         
           
       - name: Configure Git
         run: |
           git config --global user.email "100-44@mail.ru"
           git config --global user.name "Emil S."
-
+      
       - name: Initialize DVC
         run: |
           if [ ! -d ".dvc" ]; then
@@ -63,21 +63,12 @@ jobs:
 
       - name: Create DVC stage
         run: |
-          if [ ! -d ".dvc" ]; then
-            echo "DVC is not initialized. Initializing now."
-            dvc init
-          fi
-
-          if ! dvc stage list | grep -q data-cleaning; then
-            dvc stage add -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python src/clean_data.py
-            git add dvc.yaml
-            git commit -m "Create DVC stage for data cleaning"
-          else
-            echo "DVC stage 'data-cleaning' already exists"
-          fi
+          dvc stage add -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python src/clean_data.py -v
+          git add dvc.yaml
+          git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"      
 
       - name: Run DVC pipeline
-        run: dvc repro
-      
+        run: dvc repro      
+          
       - name: Push cleaned dataset to DVC remote
         run: dvc push
