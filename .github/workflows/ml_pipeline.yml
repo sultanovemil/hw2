@@ -23,18 +23,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install dvc[gdrive]
+          pip install PyDrive
 
       - name: Setup Google Drive credentials
         run: |
           echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
-          export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"
-      
+          export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"         
+          
       - name: Configure Git
         run: |
           git config --global user.email "100-44@mail.ru"
           git config --global user.name "Emil S."
       
-      - name: Initialize DVC (if not initialized)
+      - name: Initialize DVC
         run: |
           if [ ! -d ".dvc" ]; then
             dvc init
@@ -62,12 +63,12 @@ jobs:
 
       - name: Create DVC stage
         run: |
-          dvc stage add -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python src/clean_data.py
+          dvc stage add -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python src/clean_data.py --force
           git add dvc.yaml
-          git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"     
+          git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"      
 
       - name: Run DVC pipeline
-        run: dvc repro
-
+        run: dvc repro      
+          
       - name: Push cleaned dataset to DVC remote
-        run: dvc push -v
+        run: dvc push
