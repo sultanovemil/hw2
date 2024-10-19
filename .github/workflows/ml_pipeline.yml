@@ -70,4 +70,4 @@ jobs:
         run: dvc repro
 
       - name: Push cleaned dataset to DVC remote
-        run: dvc push
+        run: dvc push -v
