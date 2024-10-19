@@ -17,24 +17,28 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: '3.10'
-
-      - name: Install dependencies
+        
+      # Установка зависимостей
+      - name: Install dependencies 
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install dvc[gdrive]
           pip install PyDrive
-
+      
+      # Настройка Google Drive
       - name: Setup Google Drive credentials
         run: |
           echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
           export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"
-      
+
+      # Настройка Git
       - name: Configure Git
         run: |
           git config --global user.email "100-44@mail.ru"
           git config --global user.name "Emil S."
-      
+
+      # Инициализация DVC, если он еще не инициализирован
       - name: Initialize DVC (if not initialized)
         run: |
           if [ ! -d ".dvc" ]; then
@@ -43,12 +47,14 @@ jobs:
             git commit -m "Initialize DVC" || echo "DVC already initialized"
           fi
 
+      # Ннастройка удаленного хранилища DVC
       - name: Set up DVC remote
         run: |
           dvc remote add -d myremote gdrive://1cy4gWVCAgWblPyoAdLSKfZLMsxB9KEhx
           dvc remote modify myremote gdrive_use_service_account true
           dvc remote modify myremote gdrive_service_account_json_file_path gdrive_credentials.json
 
+      # Добавление данных в DVC
       - name: Add data to DVC
         run: |
           if git ls-files --error-unmatch data/raw_data.csv; then
@@ -61,14 +67,23 @@ jobs:
           git add data/raw_data.csv.dvc .gitignore
           git commit -m "Add raw data to DVC"
 
+      # Очистка данных
       - name: Create DVC stage
         run: |
           dvc stage add -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python src/clean_data.py
           git add dvc.yaml
           git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"     
 
+      # Запуска DVC pipeline
       - name: Run DVC pipeline
         run: dvc repro
 
+      # Шаг для отправки очищенного набора данных в удаленное хранилище DVC
       - name: Push cleaned dataset to DVC remote
         run: dvc push
+      
+      # Получение очищенных данных, проверка данных
+      - name: Pull cleaned dataset from DVC remote  
+        run: |
+          dvc pull data/cleaned_data.csv
+          head data/cleaned_data.csv
