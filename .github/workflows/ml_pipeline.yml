@@ -28,7 +28,7 @@ jobs:
       - name: Setup Google Drive credentials
         run: |
           echo -e "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
-          echo "Credentials written to gdrive_credentials.json" 
+          export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"
       
       - name: Configure Git
         run: |
