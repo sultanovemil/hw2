@@ -63,8 +63,8 @@ jobs:
 
       - name: Create DVC stage
         run: |
-          if [ ! -f "dvc.yaml" ]; then
-            echo "dvc.yaml does not exist. Initializing first."
+          if [ ! -d ".dvc" ]; then
+            echo "DVC is not initialized. Initializing now."
             dvc init
           fi
 
