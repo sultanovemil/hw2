@@ -27,7 +27,8 @@ jobs:
 
       - name: Setup Google Drive credentials
         run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" 
+          echo -e "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
+          echo "Credentials written to gdrive_credentials.json" 
       
       - name: Configure Git
         run: |
@@ -67,12 +68,7 @@ jobs:
           git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"     
 
       - name: Run DVC pipeline
-        run: dvc repro
-      
-      - name: Check credentials file
-        run: |
-          cat gdrive_credentials.json
-          echo "Credentials written to gdrive_credentials.json"
+        run: dvc repro      
           
       - name: Push cleaned dataset to DVC remote
         run: dvc push
