@@ -27,7 +27,7 @@ jobs:
 
       - name: Setup Google Drive credentials
         run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
+          echo -e "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
           export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"
       
       - name: Configure Git
@@ -70,8 +70,5 @@ jobs:
       - name: Run DVC pipeline
         run: dvc repro
 
-      - name: Display Google Credentials
-        run: echo "${{ secrets.GOOGLE_CREDENTIALS }}"
-        
       - name: Push cleaned dataset to DVC remote
         run: dvc push
