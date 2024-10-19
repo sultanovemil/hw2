@@ -23,19 +23,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install dvc[gdrive]
-          pip install PyDrive
 
       - name: Setup Google Drive credentials
         run: |
-          echo -e "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
-          export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"         
-          
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
+          export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"
+      
       - name: Configure Git
         run: |
           git config --global user.email "100-44@mail.ru"
           git config --global user.name "Emil S."
       
-      - name: Initialize DVC
+      - name: Initialize DVC (if not initialized)
         run: |
           if [ ! -d ".dvc" ]; then
             dvc init
@@ -47,7 +46,6 @@ jobs:
         run: |
           dvc remote add -d myremote gdrive://1cy4gWVCAgWblPyoAdLSKfZLMsxB9KEhx
           dvc remote modify myremote gdrive_use_service_account true
-          dvc remote modify myremote gdrive_service_account_json_file_path gdrive_credentials.json
 
       - name: Add data to DVC
         run: |
@@ -60,18 +58,12 @@ jobs:
           dvc add data/raw_data.csv
           git add data/raw_data.csv.dvc .gitignore
           git commit -m "Add raw data to DVC"
-      
-      - name: Show dir
-        run: ls -la data
-        
+
       - name: Create DVC stage
         run: |
-          dvc stage add -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python src/clean_data.py --force
+          dvc stage add -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python src/clean_data.py
           git add dvc.yaml
-          git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists" 
-      
+          git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"     
+
       - name: Run DVC pipeline
-        run: dvc repro      
-          
-      - name: Push cleaned dataset to DVC remote
-        run: dvc push
+        run: dvc repro
