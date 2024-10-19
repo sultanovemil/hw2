@@ -27,15 +27,14 @@ jobs:
 
       - name: Setup Google Drive credentials
         run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" | jq -c '.' > gdrive_credentials.json
-          export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" 
       
       - name: Configure Git
         run: |
           git config --global user.email "100-44@mail.ru"
           git config --global user.name "Emil S."
       
-      - name: Initialize DVC (if not initialized)
+      - name: Initialize DVC
         run: |
           if [ ! -d ".dvc" ]; then
             dvc init
