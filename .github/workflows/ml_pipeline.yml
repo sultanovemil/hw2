@@ -69,6 +69,11 @@ jobs:
 
       - name: Run DVC pipeline
         run: dvc repro
-
+      
+      - name: Check credentials file
+        run: |
+          cat gdrive_credentials.json
+          echo "Credentials written to gdrive_credentials.json"
+          
       - name: Push cleaned dataset to DVC remote
         run: dvc push
