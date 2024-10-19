@@ -23,7 +23,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install dvc[gdrive]
-          pip install PyDrive
 
       - name: Setup Google Drive credentials
         run: |
@@ -47,6 +46,7 @@ jobs:
         run: |
           dvc remote add -d myremote gdrive://1cy4gWVCAgWblPyoAdLSKfZLMsxB9KEhx
           dvc remote modify myremote gdrive_use_service_account true
+          dvc remote modify myremote gdrive_service_account_json_file_path gdrive_credentials.json
 
       - name: Add data to DVC
         run: |
@@ -68,3 +68,6 @@ jobs:
 
       - name: Run DVC pipeline
         run: dvc repro
+
+      - name: Push cleaned dataset to DVC remote
+        run: dvc push
