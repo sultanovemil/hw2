@@ -63,9 +63,20 @@ jobs:
 
       - name: Create DVC stage
         run: |
-          dvc stage add -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python src/clean_data.py -v
-          git add dvc.yaml
-          git commit -m "Create DVC stage for data cleaning" || echo "DVC stage already exists"      
+          # Check if DVC is already initialized by looking for the `.dvc` directory
+          if [ ! -d ".dvc" ]; then
+            echo "DVC is not initialized. Initializing now."
+            dvc init || echo "DVC initialization failed, it might already be initialized."
+          fi
+
+          # Check if the stage already exists
+          if ! dvc stage list | grep -q data-cleaning; then
+            dvc stage add -n data-cleaning -d data/raw_data.csv -o data/cleaned_data.csv python src/clean_data.py
+            git add dvc.yaml
+            git commit -m "Create DVC stage for data cleaning"
+          else
+            echo "DVC stage 'data-cleaning' already exists"
+          fi      
 
       - name: Run DVC pipeline
         run: dvc repro      
