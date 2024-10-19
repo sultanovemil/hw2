@@ -29,7 +29,8 @@ jobs:
         run: |
           echo -e "${{ secrets.GOOGLE_CREDENTIALS }}" > gdrive_credentials.json
           export GOOGLE_APPLICATION_CREDENTIALS="gdrive_credentials.json"
-      
+          echo -e "${{ secrets.GOOGLE_CREDENTIALS }}"
+          
       - name: Configure Git
         run: |
           git config --global user.email "100-44@mail.ru"
